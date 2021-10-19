@@ -13,6 +13,15 @@ describe("Store endpoint", () => {
         complete: true
     }
 
+    const failedAddNewOrder = {
+        id: "abc",
+        petId: 11,
+        quantity: 1,
+        shipDate: "2021-10-19T11:30:47.494Z",
+        status: "placed",
+        complete: true
+    }
+
     const getOrder = {
         id: 5,
         petId: 12,
@@ -52,13 +61,27 @@ describe("Store endpoint", () => {
             cy.request({
                 method: 'POST',
                 url: "/store/order",
-                body: addNewOrder
+                body: addNewOrder,
+                failOnStatusCode: false
             })
             .should((response) => {
                 cy.log(JSON.stringify(response.body));
                 expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
                 expect(response.body.id).to.equal(addNewOrder.id);
+            })
+        })
+
+        it("should return error when place an order with invalid data", () => {
+            cy.request({
+                method: 'POST',
+                url: "/store/order",
+                body: failedAddNewOrder,
+                failOnStatusCode: false
+            })
+            .should((response) => {
+                cy.log(JSON.stringify(response.body));
+                expect(response.status).to.equal(500);
             })
         })
     })
@@ -68,12 +91,25 @@ describe("Store endpoint", () => {
             cy.request({
                 method: 'GET',
                 url: `/store/order/${getOrder.id}`,
+                failOnStatusCode: false
             })
             .should((response) => {
                 cy.log(JSON.stringify(response.body));
                 expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
                 expect(response.body.id).to.equal(getOrder.id);
+            })
+        })
+
+        it("should return error message when get an order with invalid data", () => {
+            cy.request({
+                method: 'GET',
+                url: `/store/order/abc`,
+                failOnStatusCode: false
+            })
+            .should((response) => {
+                cy.log(JSON.stringify(response.body));
+                expect(response.status).to.equal(404);
             })
         })
     })
@@ -83,10 +119,23 @@ describe("Store endpoint", () => {
             cy.request({
                 method: 'DELETE',
                 url: `/store/order/${getOrder.id}`,
+                failOnStatusCode: false
             })
             .should((response) => {
                 cy.log(JSON.stringify(response.body));
                 expect(response.status).to.equal(200);;
+            })
+        })
+
+        it("should return error message when delete an order with invalid id", () => {
+            cy.request({
+                method: 'DELETE',
+                url: `/store/order/abc`,
+                failOnStatusCode: false
+            })
+            .should((response) => {
+                cy.log(JSON.stringify(response.body));
+                expect(response.status).to.equal(404);;
             })
         })
     })
