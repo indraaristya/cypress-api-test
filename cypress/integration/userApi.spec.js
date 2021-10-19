@@ -37,6 +37,17 @@ describe("User endpoint", () => {
         userStatus: 1
     }
 
+    const deleteUserData = {
+        id: 102,
+        username: "string1812",
+        firstName: "string",
+        lastName: "string",
+        email: "string",
+        password: "string",
+        phone: "string",
+        userStatus: 1
+    }
+
     before(() => {
         cy.request({
             method: "POST",
@@ -48,6 +59,12 @@ describe("User endpoint", () => {
             method: "POST",
             url: "/user",
             body: updateUserData
+        })
+
+        cy.request({
+            method: "POST",
+            url: "/user",
+            body: deleteUserData
         })
     });
 
@@ -95,6 +112,20 @@ describe("User endpoint", () => {
                 method: "PUT",
                 url: `/user/${updateUserData.username}`,
                 body: newUserData
+            })
+
+            .should((response) => {
+                cy.log(JSON.stringify(response.body));
+                expect(response.status).to.equal(200);
+            })
+        })
+    })
+
+    context("DELETE /user/{username} to delete user by username", () => {
+        it("should success delete user by valid username", () => {
+            cy.request({
+                method: "DELETE",
+                url: `/user/${deleteUserData.username}`
             })
 
             .should((response) => {
