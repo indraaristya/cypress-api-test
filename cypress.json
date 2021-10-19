@@ -1,3 +1,7 @@
 {
-    "baseUrl": "https://petstore.swagger.io/v2"
+    "baseUrl": "https://petstore.swagger.io/v2",
+    "reporter": "cypress-multi-reporters",
+    "reporterOptions": {
+        "configFile": "reporter-config.json"
+    }
 }
