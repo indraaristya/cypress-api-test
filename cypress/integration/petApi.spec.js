@@ -23,6 +23,25 @@ describe("Pet endpoint", () => {
         status: "available"
     };
 
+    const failedAddPetData = {
+      id: "abcd",
+      category: {
+        id: 0,
+        name: "string"
+      },
+      name: "doggie",
+      photoUrls: [
+        "string"
+      ],
+      tags: [
+        {
+          id: 0,
+          name: "string"
+        }
+      ],
+      status: "available"
+  };
+
     const getPetData = {
         id: 11,
         category: {
@@ -109,7 +128,7 @@ describe("Pet endpoint", () => {
                 url: "/pet",
                 body: addPetData
             })
-            .should((response) => {
+            .then((response) => {
                 cy.log(JSON.stringify(response.body))
                 expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
@@ -118,6 +137,19 @@ describe("Pet endpoint", () => {
                 expect(response.body.category).to.have.all.keys("id", "name");
             })
         })
+
+        it("should return error when add new pet with invalid data", () => {
+          cy.request({
+              method: "POST",
+              url: "/pet",
+              body: failedAddPetData,
+              failOnStatusCode: false
+          })
+          .then((response) => {
+              cy.log(JSON.stringify(response.body))
+              expect(response.status).to.equal(500);
+          })
+      })
     })
 
     context("GET /pet/{id} by petId", () => {
@@ -125,8 +157,9 @@ describe("Pet endpoint", () => {
             cy.request({
                 method: "GET",
                 url: `/pet/${getPetData.id}`,
+                failOnStatusCode: false
             })
-            .should((response) => {
+            .then((response) => {
                 cy.log(JSON.stringify(response.body))
                 expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
@@ -136,6 +169,18 @@ describe("Pet endpoint", () => {
                 expect(response.body.category).to.have.all.keys("id", "name");
             })
         })
+
+        it("should return error when get pet with invalid petId", () => {
+          cy.request({
+              method: "GET",
+              url: `/pet/abc`,
+              failOnStatusCode: false
+          })
+          .then(response => {
+              cy.log(JSON.stringify(response.body))
+              expect(response.status).to.equal(404);
+          })
+      })
     })
 
     context("PUT /pet existed pet by petId", () => {
@@ -148,9 +193,10 @@ describe("Pet endpoint", () => {
             cy.request({
                 method: "PUT",
                 url: "/pet",
-                body: newPetData
+                body: newPetData,
+                failOnStatusCode: false
             })
-            .should((response) => {
+            .then((response) => {
                 cy.log(JSON.stringify(response.body))
                 expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
@@ -161,6 +207,24 @@ describe("Pet endpoint", () => {
                 expect(response.body.category).to.have.all.keys("id", "name");
             })
         })
+
+        it("should return error when update pet with valid petId and invalid body request", () => {
+          const newPetData = {
+              ...updatePetData
+          }
+          newPetData.name = { } ;
+          newPetData.status = "unavailable";
+          cy.request({
+              method: "PUT",
+              url: "/pet",
+              body: newPetData,
+              failOnStatusCode: false
+          })
+          .then((response) => {
+              cy.log(JSON.stringify(response.body))
+              expect(response.status).to.equal(500);
+          })
+      })
     })
 
     context("DELETE /pet/{id} existed pet by petId", () => {
@@ -168,13 +232,26 @@ describe("Pet endpoint", () => {
             cy.request({
                 method: "DELETE",
                 url: `/pet/${deletePetData.id}`,
+                failOnStatusCode: false
             })
-            .should((response) => {
+            .then((response) => {
                 cy.log(JSON.stringify(response.body))
                 expect(response.status).to.equal(200);
                 expect(response.body.code).to.equal(200);
                 expect(response.body).to.have.all.keys("code", "type", "message");
             })
         })
+
+        it("should return error when delete pet with invalid petId", () => {
+          cy.request({
+              method: "DELETE",
+              url: `/pet/abc`,
+              failOnStatusCode: false
+          })
+          .then((response) => {
+              cy.log(JSON.stringify(response.body))
+              expect(response.status).to.equal(404);
+          })
+      })
     })
 })
