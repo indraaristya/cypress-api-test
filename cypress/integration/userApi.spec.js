@@ -26,11 +26,28 @@ describe("User endpoint", () => {
         userStatus: 1
     }
 
+    const updateUserData = {
+        id: 101,
+        username: "string1811",
+        firstName: "string",
+        lastName: "string",
+        email: "string",
+        password: "string",
+        phone: "string",
+        userStatus: 1
+    }
+
     before(() => {
         cy.request({
             method: "POST",
             url: "/user",
             body: getUserData
+        })
+
+        cy.request({
+            method: "POST",
+            url: "/user",
+            body: updateUserData
         })
     });
 
@@ -63,6 +80,26 @@ describe("User endpoint", () => {
                 expect(response.status).to.equal(200);
                 expect(validate(response.body)).to.be.true;
                 expect(response.body.username).to.equal(getUserData.username);
+            })
+        })
+    })
+
+    context("PUT /user/{username} update username", () => {
+        it("should success update user by valid username and data", () => {
+            const newUserData = {
+                ...updateUserData
+            }
+            newUserData.username = 'newusername1810';
+            
+            cy.request({
+                method: "PUT",
+                url: `/user/${updateUserData.username}`,
+                body: newUserData
+            })
+
+            .should((response) => {
+                cy.log(JSON.stringify(response.body));
+                expect(response.status).to.equal(200);
             })
         })
     })
