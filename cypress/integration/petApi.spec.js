@@ -1,3 +1,8 @@
+const Ajv = require("ajv");
+const ajv = new Ajv();
+
+const petSchema = require('../schemas/pet.js').addPetResponse;
+
 describe("Pet endpoint", () => {
     const addPetData = {
         id: 10,
@@ -95,6 +100,8 @@ describe("Pet endpoint", () => {
         })
     });
 
+    const validate = ajv.compile(petSchema)
+
     context("POST /pet to add new pet to the store", () => {
         it("should success add new pet with valid data", () => {
             cy.request({
@@ -104,6 +111,7 @@ describe("Pet endpoint", () => {
             })
             .should((response) => {
                 cy.log(JSON.stringify(response.body))
+                expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
                 expect(response.body.name).to.equal(addPetData.name);
                 expect(response.body).to.have.all.keys("id", "category", "name", "photoUrls", "tags", "status");
@@ -120,6 +128,7 @@ describe("Pet endpoint", () => {
             })
             .should((response) => {
                 cy.log(JSON.stringify(response.body))
+                expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
                 expect(response.body.id).to.equal(getPetData.id);
                 expect(response.body.name).to.equal(getPetData.name);
@@ -143,6 +152,7 @@ describe("Pet endpoint", () => {
             })
             .should((response) => {
                 cy.log(JSON.stringify(response.body))
+                expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
                 expect(response.body.id).to.equal(newPetData.id);
                 expect(response.body.name).to.equal(newPetData.name);
