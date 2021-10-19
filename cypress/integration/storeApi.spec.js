@@ -14,7 +14,7 @@ describe("Store endpoint", () => {
     }
 
     const getOrder = {
-        id: 11,
+        id: 5,
         petId: 12,
         quantity: 1,
         shipDate: "2021-10-19T11:30:47.494Z",
