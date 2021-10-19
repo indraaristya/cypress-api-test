@@ -22,11 +22,26 @@ describe("Store endpoint", () => {
         complete: true
     }
 
+    const deleteOrder = {
+        id: 12,
+        petId: 12,
+        quantity: 1,
+        shipDate: "2021-10-19T11:30:47.494Z",
+        status: "placed",
+        complete: true
+    }
+
     before(() => {
         cy.request({
             method: "POST",
             url: "/store/order",
             body: getOrder
+        })
+
+        cy.request({
+            method: "POST",
+            url: "/store/order",
+            body: deleteOrder
         })
     });
 
@@ -59,6 +74,19 @@ describe("Store endpoint", () => {
                 expect(validate(response.body)).to.be.true;
                 expect(response.status).to.equal(200);
                 expect(response.body.id).to.equal(getOrder.id);
+            })
+        })
+    })
+
+    context("DELETE /store/{id} to delete an valid order for a pet", () => {
+        it("should success to delete an order with valid id", () => {
+            cy.request({
+                method: 'DELETE',
+                url: `/store/order/${getOrder.id}`,
+            })
+            .should((response) => {
+                cy.log(JSON.stringify(response.body));
+                expect(response.status).to.equal(200);;
             })
         })
     })
