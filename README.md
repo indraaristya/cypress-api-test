@@ -8,6 +8,8 @@ After the installation finished, we can run the test with type this command.
 ```
 npm run cypress:all
 ```
+Once the test executed and finished, the report will be generated and saved in directory `./cypress/results/api-test-result.html` (open with browser to compile the HTML and see the report)
+
 
 If you want to open the cypress GUI to see the details test progress, run this command.
 ```
